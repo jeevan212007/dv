@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIFA 18 — 12 Tableau Grains</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sora',sans-serif;background:#f4f6fb;color:#1a1d2e;line-height:1.6}
+
+.top-bar{background:#0f1c3f;color:white;padding:0 2rem;display:flex;align-items:center;gap:1rem;height:58px;position:sticky;top:0;z-index:100}
+.top-bar .logo{font-size:1rem;font-weight:600;color:#e8c847;letter-spacing:.03em}
+.top-bar .subtitle{font-size:0.78rem;color:rgba(255,255,255,0.55);border-left:1px solid rgba(255,255,255,0.15);padding-left:1rem}
+
+.page{max-width:980px;margin:0 auto;padding:2rem 1.5rem}
+
+.intro-band{background:#0f1c3f;border-radius:14px;padding:2.5rem;color:white;margin-bottom:2rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center}
+.intro-band h1{font-size:1.6rem;font-weight:600;margin-bottom:.4rem}
+.intro-band p{font-size:.88rem;color:rgba(255,255,255,.65);max-width:520px;line-height:1.7}
+.badge-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
+.badge{background:rgba(232,200,71,.15);color:#e8c847;border:1px solid rgba(232,200,71,.3);border-radius:20px;padding:.2rem .75rem;font-size:.72rem;font-weight:500}
+.connect-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:1.25rem 1.5rem;min-width:210px}
+.connect-box h4{font-size:.72rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.connect-step{font-size:.78rem;color:rgba(255,255,255,.75);padding:.25rem 0;display:flex;gap:.5rem;align-items:flex-start}
+.connect-step .cs-num{background:#e8c847;color:#0f1c3f;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:600;flex-shrink:0;margin-top:2px}
+
+.grain-list{display:flex;flex-direction:column;gap:2rem}
+
+.grain-card{background:white;border-radius:14px;border:1px solid #e2e6f0;overflow:hidden}
+.grain-header{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:1.25rem 1.5rem;border-bottom:1px solid #e2e6f0;cursor:pointer;user-select:none}
+.grain-header:hover{background:#fafbff}
+.grain-num-badge{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;flex-shrink:0}
+.grain-meta{}
+.grain-meta .chart-type{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem}
+.grain-meta h3{font-size:.98rem;font-weight:600;color:#1a1d2e}
+.grain-meta p{font-size:.78rem;color:#6b7280;margin-top:.15rem}
+.grain-insight{text-align:right}
+.grain-insight .val{font-size:1.5rem;font-weight:600;line-height:1}
+.grain-insight .lbl{font-size:.68rem;color:#9ca3af;margin-top:.15rem}
+.expand-icon{font-size:.8rem;color:#9ca3af;margin-left:.5rem;transition:transform .25s}
+.grain-header.open .expand-icon{transform:rotate(180deg)}
+
+.grain-body{display:none;padding:1.5rem}
+.grain-body.open{display:block}
+.grain-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+
+.section-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:#9ca3af;margin-bottom:.75rem}
+
+.steps-list{counter-reset:step;display:flex;flex-direction:column;gap:0}
+.step{display:grid;grid-template-columns:28px 1fr;gap:.6rem;align-items:start;padding:.5rem 0;border-bottom:1px solid #f0f2f8}
+.step:last-child{border-bottom:none}
+.step-num{counter-increment:step;width:24px;height:24px;border-radius:50%;background:#0f1c3f;color:white;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:600;flex-shrink:0;margin-top:2px}
+.step-text{font-size:.82rem;color:#374151;line-height:1.6}
+.step-text code{background:#f0f4ff;color:#1a4fce;border-radius:4px;padding:.1rem .35rem;font-family:'JetBrains Mono',monospace;font-size:.75rem}
+.step-text strong{font-weight:600;color:#1a1d2e}
+
+.shelf-diagram{background:#f8faff;border:1px solid #e2e6f0;border-radius:10px;padding:1rem}
+.shelf-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;font-size:.78rem}
+.shelf-row:last-child{margin-bottom:0}
+.shelf-label{background:#e2e6f0;color:#4b5563;border-radius:4px;padding:.15rem .5rem;font-weight:500;min-width:75px;text-align:center;font-size:.7rem}
+.shelf-arrow{color:#9ca3af;font-size:.75rem}
+.field-pill{border-radius:6px;padding:.15rem .55rem;font-size:.73rem;font-weight:500}
+.dim{background:#e6f0fb;color:#1a4fce}
+.meas{background:#e6f5ec;color:#166534}
+.calc{background:#fef3cd;color:#854d0e}
+
+.insight-box{background:#f0faf5;border:1px solid #bbf0d8;border-radius:10px;padding:1rem;font-size:.82rem;color:#065f46;line-height:1.7}
+.insight-box strong{font-weight:600}
+
+.tip-box{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:.85rem 1rem;font-size:.78rem;color:#78350f;margin-top:.75rem;line-height:1.6}
+.tip-box strong{font-weight:600}
+
+.color-strip{height:4px;margin-bottom:0}
+
+@media(max-width:700px){
+  .intro-band{grid-template-columns:1fr;}.connect-box{display:none}
+  .grain-body-grid{grid-template-columns:1fr}
+  .grain-header{grid-template-columns:auto 1fr}
+  .grain-insight{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="logo">Tableau Grains</span>
+  <span class="subtitle">FIFA 18 Player Dataset &mdash; 12 Beginner Visualizations</span>
+</div>
+
+<div class="page">
+
+<div class="intro-band">
+  <div>
+    <h1>12 Tableau Grains &mdash; FIFA 18</h1>
+    <p>Each grain is one Tableau view you build from the FIFA 18 dataset. Expand any card to see the exact shelf configuration and step-by-step instructions. Build all 12 to create your first complete Tableau workbook.</p>
+    <div class="badge-row">
+      <span class="badge">Beginner Level</span>
+      <span class="badge">17,981 Players</span>
+      <span class="badge">Tableau Desktop / Public</span>
+      <span class="badge">Data Source: nex.txt (CSV)</span>
+    </div>
+  </div>
+  <div class="connect-box">
+    <h4>Connect to data first</h4>
+    <div class="connect-step"><div class="cs-num">1</div>Open Tableau &rarr; Connect &rarr; Text File</div>
+    <div class="connect-step"><div class="cs-num">2</div>Select <code>nex.txt</code>, set separator to Tab</div>
+    <div class="connect-step"><div class="cs-num">3</div>On Data Source page, verify column headers appear correctly</div>
+    <div class="connect-step"><div class="cs-num">4</div>Click Sheet 1 to start building</div>
+  </div>
+</div>
+
+<div class="grain-list" id="grains"></div>
+</div>
+
+<script>
+const GRAINS = [
+  {
+    color:"#1a5fb4", lightColor:"#dbeafe",
+    num:"01", chartType:"Bar Chart", chartIcon:"&#9646;",
+    title:"Overall rating distribution",
+    summary:"How many players fall in each rating band?",
+    insight:"49%", insightLabel:"are 65–74 rated",
+    shelves:[
+      {label:"Columns", fields:[{name:"Overall (binned)", type:"calc"}]},
+      {label:"Rows", fields:[{name:"CNT(Name)", type:"meas"}]},
+      {label:"Color", fields:[{name:"Overall (binned)", type:"calc"}]},
+    ],
+    steps:[
+      "Right-click <strong>Overall</strong> in the Data pane &rarr; <strong>Create &rarr; Bins</strong>. Set bin size to <code>10</code>. Click OK.",
+      "Drag <strong>Overall (bin)</strong> to the <strong>Columns</strong> shelf.",
+      "Drag <strong>Name</strong> to the <strong>Rows</strong> shelf. Right-click it &rarr; <strong>Measure &rarr; Count</strong>.",
+      "Drag <strong>Overall (bin)</strong> also to the <strong>Color</strong> card on Marks.",
+      "On the Marks card, change the chart type dropdown from Automatic to <strong>Bar</strong>.",
+      "Right-click the x-axis &rarr; <strong>Edit Axis</strong> &rarr; rename to <code>Rating Band</code>.",
+      "Click <strong>Fit &rarr; Entire View</strong> in the toolbar to expand the bars.",
+      "Double-click the sheet tab at the bottom &rarr; rename to <code>Grain 01 - Rating Distribution</code>."
+    ],
+    insight_text:"The chart shows a clear bell curve skewed left: most players (8,849) are in the 65–74 band. Only 92 players score 85+. Elite talent is extremely rare.",
+    tip:"Sort bars by right-clicking the x-axis and choosing Sort Descending to see which band is largest instantly."
+  },
+  {
+    color:"#166534", lightColor:"#dcfce7",
+    num:"02", chartType:"Horizontal Bar Chart", chartIcon:"&#9644;",
+    title:"Top nationalities by player count",
+    summary:"Which countries produce the most FIFA players?",
+    insight:"1,630", insightLabel:"English players",
+    shelves:[
+      {label:"Rows", fields:[{name:"Nationality", type:"dim"}]},
+      {label:"Columns", fields:[{name:"CNT(Name)", type:"meas"}]},
+      {label:"Filter", fields:[{name:"Top 10 Nationality", type:"calc"}]},
+      {label:"Color", fields:[{name:"CNT(Name)", type:"meas"}]},
+    ],
+    steps:[
+      "Drag <strong>Nationality</strong> to the <strong>Rows</strong> shelf.",
+      "Drag <strong>Name</strong> to the <strong>Columns</strong> shelf. Right-click &rarr; <strong>Measure &rarr; Count</strong>.",
+      "Drag <strong>Nationality</strong> to the <strong>Filters</strong> card. In the dialog click the <strong>Top</strong> tab.",
+      "Select <strong>By Field</strong> &rarr; Top <code>10</code> &rarr; by <strong>Count of Name</strong> &rarr; click OK.",
+      "Click the <strong>Sort Descending</strong> button on the toolbar (the bar chart icon with a down arrow).",
+      "Drag <strong>CNT(Name)</strong> to the <strong>Color</strong> card. A blue gradient will appear.",
+      "Drag <strong>CNT(Name)</strong> to the <strong>Label</strong> card so counts appear on each bar.",
+      "Rename the sheet <code>Grain 02 - Top Nationalities</code>."
+    ],
+    insight_text:"England (1,630), Germany (1,140), and Spain (1,019) are the top three. Despite England leading in volume, no English player appears in the top-10 overall ratings.",
+    tip:"Hold Ctrl and click multiple nationalities on the chart to highlight them. Right-click &rarr; Keep Only for quick filtering."
+  },
+  {
+    color:"#b45309", lightColor:"#fef3c7",
+    num:"03", chartType:"Pie Chart", chartIcon:"&#11044;",
+    title:"Age group distribution",
+    summary:"What percentage of players fall in each age band?",
+    insight:"67%", insightLabel:"aged 21–30",
+    shelves:[
+      {label:"Angle", fields:[{name:"CNT(Name)", type:"meas"}]},
+      {label:"Color", fields:[{name:"Age Group", type:"calc"}]},
+      {label:"Label", fields:[{name:"CNT(Name)", type:"meas"},{name:"Age Group", type:"calc"}]},
+    ],
+    steps:[
+      "Create a calculated field: <strong>Analysis &rarr; Create Calculated Field</strong>. Name it <code>Age Group</code>.",
+      "Enter the formula: <code>IF [Age]&lt;=20 THEN 'U21' ELSEIF [Age]&lt;=25 THEN '21-25' ELSEIF [Age]&lt;=30 THEN '26-30' ELSEIF [Age]&lt;=35 THEN '31-35' ELSE '36+' END</code>. Click OK.",
+      "On the Marks card change chart type to <strong>Pie</strong>.",
+      "Drag <strong>CNT(Name)</strong> (count of Name) to the <strong>Angle</strong> shelf (inside Marks).",
+      "Drag <strong>Age Group</strong> to the <strong>Color</strong> shelf on Marks.",
+      "Drag both <strong>Age Group</strong> and <strong>CNT(Name)</strong> to the <strong>Label</strong> shelf on Marks.",
+      "Click <strong>Label</strong> on Marks &rarr; tick <strong>Show mark labels</strong>.",
+      "In the toolbar choose <strong>Fit &rarr; Entire View</strong>. Rename sheet <code>Grain 03 - Age Groups</code>."
+    ],
+    insight_text:"21–30 is the dominant prime window. Only 277 players are 36+, confirming football careers are short and earnings are concentrated in a narrow window.",
+    tip:"After creating the Pie, go to Analysis menu &rarr; uncheck Aggregate Measures if slices look wrong."
+  },
+  {
+    color:"#7c3aed", lightColor:"#ede9fe",
+    num:"04", chartType:"Highlight Table (Text Table)", chartIcon:"&#11035;",
+    title:"Top 10 highest paid players",
+    summary:"Who earns the most per week, and by how much?",
+    insight:"€565K", insightLabel:"joint top wage",
+    shelves:[
+      {label:"Rows", fields:[{name:"Name", type:"dim"}]},
+      {label:"Columns", fields:[{name:"Wage (€)", type:"meas"}]},
+      {label:"Filter", fields:[{name:"Top 10 by Wage", type:"calc"}]},
+      {label:"Color", fields:[{name:"Wage (€)", type:"meas"}]},
+      {label:"Label", fields:[{name:"Wage (€)", type:"meas"}]},
+    ],
+    steps:[
+      "Drag <strong>Name</strong> to the <strong>Rows</strong> shelf.",
+      "Drag <strong>Wage (€)</strong> to the <strong>Columns</strong> shelf. It will show as SUM by default.",
+      "Drag <strong>Name</strong> to the <strong>Filters</strong> card. Click the <strong>Top</strong> tab &rarr; By Field &rarr; Top <code>10</code> &rarr; <strong>Wage (€)</strong> &rarr; Sum. Click OK.",
+      "Click <strong>Sort Descending</strong> on the toolbar so the highest earner is at the top.",
+      "Drag <strong>Wage (€)</strong> to the <strong>Color</strong> card on Marks for a gradient intensity view.",
+      "Drag <strong>Wage (€)</strong> to the <strong>Label</strong> card. Right-click the field on Label &rarr; Format &rarr; set number format to <code>Currency (Custom)</code> prefix €.",
+      "Change the Marks type to <strong>Bar</strong> for a cleaner look.",
+      "Rename sheet <code>Grain 04 - Top Wages</code>."
+    ],
+    insight_text:"Ronaldo and Messi both earn €565,000/week — equal pay for what the market considers equal greatness. The third place Suárez earns 10% less at €510,000.",
+    tip:"Add Nationality to the Color shelf instead of Wage to see which country claims the highest-paid players."
+  },
+  {
+    color:"#be123c", lightColor:"#ffe4e6",
+    num:"05", chartType:"Scatter Plot", chartIcon:"&#8901;",
+    title:"Market value vs overall rating",
+    summary:"Does a higher rating always mean a higher price?",
+    insight:"€123M", insightLabel:"Neymar (rated 92, not #1)",
+    shelves:[
+      {label:"Columns", fields:[{name:"Overall", type:"dim"}]},
+      {label:"Rows", fields:[{name:"Value (€)", type:"meas"}]},
+      {label:"Detail", fields:[{name:"Name", type:"dim"}]},
+      {label:"Color", fields:[{name:"Nationality", type:"dim"}]},
+      {label:"Size", fields:[{name:"Age", type:"meas"}]},
+    ],
+    steps:[
+      "Drag <strong>Overall</strong> to the <strong>Columns</strong> shelf. Right-click it &rarr; select <strong>Dimension</strong> (removes aggregation).",
+      "Drag <strong>Value (€)</strong> to the <strong>Rows</strong> shelf.",
+      "Drag <strong>Name</strong> to the <strong>Detail</strong> card on Marks — this plots one dot per player.",
+      "Change Marks type to <strong>Circle</strong> if not already.",
+      "Drag <strong>Age</strong> to the <strong>Size</strong> card — younger players get smaller dots.",
+      "Drag <strong>Nationality</strong> to <strong>Color</strong> and edit colors to highlight key nations.",
+      "Add a trend line: <strong>Analysis menu &rarr; Trend Lines &rarr; Show Trend Lines</strong>. Observe the upward slope.",
+      "Add a <strong>Name</strong> label to the highest dots: click a dot &rarr; right-click &rarr; <strong>Mark Label &rarr; Always Show</strong>. Rename sheet <code>Grain 05 - Value vs Rating</code>."
+    ],
+    insight_text:"The trend is upward but with outliers. Neymar (92 rated) is priced at €123M — higher than Ronaldo (94 rated, €95.5M). Age and transfer timing create premium pricing.",
+    tip:"Use a Reference Line (Analytics pane &rarr; drag Reference Line to the view) to mark the €50M threshold and identify which players sit above it."
+  },
+  {
+    color:"#0f766e", lightColor:"#ccfbf1",
+    num:"06", chartType:"Bullet Chart (Bar + Reference Line)", chartIcon:"&#9646;",
+    title:"Young stars: overall vs potential",
+    summary:"Which U23 players have the biggest growth gap?",
+    insight:"+11 pts", insightLabel:"avg growth window",
+    shelves:[
+      {label:"Rows", fields:[{name:"Name", type:"dim"}]},
+      {label:"Columns", fields:[{name:"Overall", type:"meas"},{name:"Potential", type:"meas"}]},
+      {label:"Filter", fields:[{name:"Age ≤ 23", type:"calc"},{name:"Potential ≥ 88", type:"calc"}]},
+    ],
+    steps:[
+      "Create filter: drag <strong>Age</strong> to Filters &rarr; Range of Values &rarr; set Max to <code>23</code>. Click OK.",
+      "Create a second filter: drag <strong>Potential</strong> to Filters &rarr; Range of Values &rarr; set Min to <code>88</code>. Click OK.",
+      "Drag <strong>Name</strong> to <strong>Rows</strong>.",
+      "Drag <strong>Overall</strong> to <strong>Columns</strong>. Then hold Ctrl and drag <strong>Potential</strong> also to <strong>Columns</strong> — you now have two bars side by side.",
+      "Click <strong>Show Me</strong> in the toolbar and select <strong>Side-by-side bars</strong> if the layout isn't clear.",
+      "Color Overall bars in gray and Potential bars in green: click one bar &rarr; right-click &rarr; <strong>Edit Color</strong>.",
+      "Add <strong>Overall</strong> and <strong>Potential</strong> to the <strong>Label</strong> card so numbers appear.",
+      "Sort descending by Potential. Rename sheet <code>Grain 06 - Future Stars</code>."
+    ],
+    insight_text:"Mbappé (18, potential 94) and Donnarumma (18, potential 94) have a +11 point gap. Clubs pay premium transfer fees for this gap — buying the future player, not just the current one.",
+    tip:"Create a calculated field <code>[Potential] - [Overall]</code> named Growth Gap and drag it to Color for a gradient that makes the biggest growth opportunities visually obvious."
+  },
+  {
+    color:"#1e40af", lightColor:"#dbeafe",
+    num:"07", chartType:"Box-and-Whisker Plot", chartIcon:"&#9646;",
+    title:"Wage spread by preferred position",
+    summary:"How wide is the wage range within each position?",
+    insight:"GK lowest", insightLabel:"€7,855 avg wage",
+    shelves:[
+      {label:"Columns", fields:[{name:"Preferred Positions", type:"dim"}]},
+      {label:"Rows", fields:[{name:"Wage (€)", type:"meas"}]},
+      {label:"Detail", fields:[{name:"Name", type:"dim"}]},
+    ],
+    steps:[
+      "Drag <strong>Preferred Positions</strong> to the <strong>Columns</strong> shelf.",
+      "Drag <strong>Wage (€)</strong> to the <strong>Rows</strong> shelf.",
+      "Drag <strong>Name</strong> to the <strong>Detail</strong> card — this disaggregates data so each player is one dot.",
+      "In <strong>Show Me</strong>, click <strong>Box-and-Whisker Plot</strong>. Tableau will build the distribution automatically.",
+      "Right-click the view &rarr; <strong>Format</strong> &rarr; set box fill to a light blue color.",
+      "On the Columns shelf, right-click <strong>Preferred Positions</strong> &rarr; Sort by <strong>Wage (€) &rarr; Average &rarr; Ascending</strong> to rank positions cheapest to most expensive.",
+      "Add a Reference Line from the Analytics pane: drag <strong>Average Line</strong> onto the view. Set scope to <strong>Table</strong>.",
+      "Rename sheet <code>Grain 07 - Wage by Position</code>."
+    ],
+    insight_text:"Wingers (LW/RW) have both the highest average wage and the widest spread. GKs cluster tightly at the lower end. The box shows that most wages are compressed — a few superstars pull the mean up.",
+    tip:"Filter Preferred Positions to only GK, ST, CM, CB, LW, RW for a cleaner comparison of the six core positions."
+  },
+  {
+    color:"#9d174d", lightColor:"#fce7f3",
+    num:"08", chartType:"Treemap", chartIcon:"&#11035;",
+    title:"Player count by club",
+    summary:"Which clubs have the largest squads in the dataset?",
+    insight:"34–35", insightLabel:"players per big club",
+    shelves:[
+      {label:"Size", fields:[{name:"CNT(Name)", type:"meas"}]},
+      {label:"Color", fields:[{name:"CNT(Name)", type:"meas"}]},
+      {label:"Label", fields:[{name:"Club", type:"dim"},{name:"CNT(Name)", type:"meas"}]},
+      {label:"Filter", fields:[{name:"Top 20 Clubs", type:"calc"}]},
+    ],
+    steps:[
+      "In <strong>Show Me</strong>, click the <strong>Treemap</strong> icon (the one with nested rectangles).",
+      "Drag <strong>Club</strong> to the <strong>Label</strong> card on Marks.",
+      "Drag <strong>Name</strong> to the <strong>Size</strong> card. Right-click &rarr; <strong>Measure &rarr; Count</strong>.",
+      "Drag <strong>CNT(Name)</strong> also to the <strong>Color</strong> card — bigger squads will be darker.",
+      "Drag <strong>Club</strong> to the <strong>Filters</strong> card &rarr; Top tab &rarr; Top <code>20</code> by <strong>CNT(Name)</strong>. Click OK.",
+      "Drag <strong>CNT(Name)</strong> to the <strong>Label</strong> card as well so numbers display inside each rectangle.",
+      "Edit colors: click Color &rarr; Edit Colors &rarr; choose a sequential blue or green palette.",
+      "Rename sheet <code>Grain 08 - Squad Sizes Treemap</code>."
+    ],
+    insight_text:"Top-league clubs like Villarreal CF, Borussia Dortmund, and Manchester United all have ~34 players in the dataset — consistent squad sizes across elite leagues.",
+    tip:"Add League or Nationality as a second dimension in the Label field to create a nested treemap where clubs are grouped by country."
+  },
+  {
+    color:"#155e75", lightColor:"#cffafe",
+    num:"09", chartType:"Dual-Axis Line Chart", chartIcon:"&#9135;",
+    title:"Average overall and potential by age",
+    summary:"At what age do players peak — and when does potential stop growing?",
+    insight:"Peak ~27", insightLabel:"overall rating",
+    shelves:[
+      {label:"Columns", fields:[{name:"Age", type:"dim"}]},
+      {label:"Rows", fields:[{name:"AVG(Overall)", type:"meas"},{name:"AVG(Potential)", type:"meas"}]},
+    ],
+    steps:[
+      "Drag <strong>Age</strong> to the <strong>Columns</strong> shelf. Right-click it &rarr; select <strong>Dimension</strong>.",
+      "Drag <strong>Overall</strong> to the <strong>Rows</strong> shelf. Tableau auto-aggregates as AVG.",
+      "Right-click the <strong>Overall</strong> pill on Rows &rarr; <strong>Measure &rarr; Average</strong> to confirm.",
+      "Hold Ctrl and drag <strong>Potential</strong> also to the <strong>Rows</strong> shelf next to Overall.",
+      "Right-click the second y-axis (right side) &rarr; <strong>Dual Axis</strong>. Both lines now share one axis.",
+      "Right-click the shared axis &rarr; <strong>Synchronize Axis</strong> so scales align.",
+      "Change Marks type for both to <strong>Line</strong>. Set Overall to blue and Potential to orange.",
+      "Add a <strong>Reference Band</strong> from the Analytics pane to highlight ages 24–28 as the peak window. Rename sheet <code>Grain 09 - Peak Age Analysis</code>."
+    ],
+    insight_text:"Overall rating rises steeply from 16 to ~27, then plateaus and slowly declines after 32. Potential converges toward Overall by age 28 — showing that by then, a player is largely what they'll be.",
+    tip:"Filter to only players with Overall ≥ 75 to see how elite players' peak age differs from the general population."
+  },
+  {
+    color:"#4338ca", lightColor:"#e0e7ff",
+    num:"10", chartType:"Map Visualization", chartIcon:"&#9679;",
+    title:"Player geographic origin map",
+    summary:"Where in the world do FIFA players come from?",
+    insight:"6 continents", insightLabel:"represented",
+    shelves:[
+      {label:"Map (auto)", fields:[{name:"Nationality", type:"dim"}]},
+      {label:"Color", fields:[{name:"CNT(Name)", type:"meas"}]},
+      {label:"Size", fields:[{name:"CNT(Name)", type:"meas"}]},
+      {label:"Tooltip", fields:[{name:"AVG(Overall)", type:"meas"}]},
+    ],
+    steps:[
+      "Double-click <strong>Nationality</strong> in the Data pane. Tableau automatically creates a map since it recognizes country names.",
+      "If dots appear, you already have a symbol map. If regions are colored, you have a filled map. Both work.",
+      "Drag <strong>CNT(Name)</strong> to the <strong>Color</strong> card — countries with more players will be darker.",
+      "Drag <strong>CNT(Name)</strong> to the <strong>Size</strong> card — for symbol maps, bigger bubbles = more players.",
+      "Drag <strong>AVG(Overall)</strong> to the <strong>Tooltip</strong> card so hovering over a country shows average quality.",
+      "Click the <strong>Map menu &rarr; Map Layers</strong> to add country borders and context.",
+      "In the Marks card, change type to <strong>Filled Map</strong> for a choropleth effect.",
+      "Edit color palette to a sequential blue scheme. Rename sheet <code>Grain 10 - Player Origins Map</code>."
+    ],
+    insight_text:"Europe dominates player production, with England, Germany, Spain, France, and Argentina forming the top 5. South America contributes a disproportionately high share of high-rated players.",
+    tip:"Create a second calculated field for Average Overall Rating and use it on Color to make the map show quality rather than quantity — then compare the two maps side by side."
+  },
+  {
+    color:"#b45309", lightColor:"#fef3c7",
+    num:"11", chartType:"Stacked Bar Chart", chartIcon:"&#9646;",
+    title:"Rating tier breakdown by top club",
+    summary:"How do the best clubs differ in their talent composition?",
+    insight:"FC Barcelona", insightLabel:"highest avg overall",
+    shelves:[
+      {label:"Rows", fields:[{name:"Club", type:"dim"}]},
+      {label:"Columns", fields:[{name:"CNT(Name)", type:"meas"}]},
+      {label:"Color", fields:[{name:"Rating Tier", type:"calc"}]},
+      {label:"Filter", fields:[{name:"Top 10 Clubs by Avg Overall", type:"calc"}]},
+    ],
+    steps:[
+      "Create a calculated field called <code>Rating Tier</code>: <code>IF [Overall]>=85 THEN 'Elite 85+' ELSEIF [Overall]>=75 THEN 'Good 75-84' ELSEIF [Overall]>=65 THEN 'Average 65-74' ELSE 'Developing &lt;65' END</code>.",
+      "Drag <strong>Club</strong> to the <strong>Rows</strong> shelf.",
+      "Drag <strong>Name</strong> to <strong>Columns</strong> &rarr; right-click &rarr; <strong>Measure &rarr; Count</strong>.",
+      "Drag <strong>Rating Tier</strong> to the <strong>Color</strong> card. Tableau creates a stacked bar automatically.",
+      "Drag <strong>Club</strong> to <strong>Filters</strong> &rarr; Top tab &rarr; Top <code>10</code> by <strong>AVG(Overall)</strong>. Click OK.",
+      "Sort rows by right-clicking the Rows header &rarr; Sort by <strong>Field &rarr; AVG(Overall) &rarr; Descending</strong>.",
+      "Set segment colors: Elite = gold, Good = green, Average = gray, Developing = light gray.",
+      "Rename sheet <code>Grain 11 - Club Rating Tiers</code>."
+    ],
+    insight_text:"Elite clubs like Real Madrid and FC Barcelona have a higher proportion of 75+ rated players. Smaller clubs in the top-10 table achieve their ranking through specialized player quality in key positions.",
+    tip:"Switch from stacked to 100% stacked by right-clicking the x-axis &rarr; Add Reference Line &rarr; set to 100% for a proportion view that's easier to compare across clubs of different sizes."
+  },
+  {
+    color:"#14532d", lightColor:"#dcfce7",
+    num:"12", chartType:"KPI Dashboard (Text + BANs)", chartIcon:"&#9632;",
+    title:"Executive KPI summary — big numbers at a glance",
+    summary:"What are the 5 headline numbers from this dataset?",
+    insight:"5 KPIs", insightLabel:"one dashboard view",
+    shelves:[
+      {label:"Text (×5)", fields:[{name:"KPI value", type:"meas"}]},
+      {label:"Layout", fields:[{name:"Horizontal containers", type:"calc"}]},
+    ],
+    steps:[
+      "Create <strong>5 new blank sheets</strong> — one for each KPI: Total Players, Avg Rating, Top Wage, Highest Value, Avg Age.",
+      "On each sheet: drag the relevant measure to the <strong>Text</strong> card on Marks. Set Marks type to <strong>Text</strong>.",
+      "Format the number: right-click the measure &rarr; <strong>Format</strong> &rarr; set font size to <code>36pt</code>, bold. For wages/values add € prefix.",
+      "For <em>Total Players</em>: drag <strong>Name</strong> to Text &rarr; Measure &rarr; Count. Format as integer.",
+      "For <em>Avg Rating</em>: drag <strong>Overall</strong> to Text &rarr; Measure &rarr; Average. Format to 1 decimal.",
+      "Click the <strong>Dashboard</strong> menu &rarr; <strong>New Dashboard</strong>. Set size to <code>1200 × 400</code>.",
+      "Drag a <strong>Horizontal Layout Container</strong> from the Objects panel onto the canvas. Drag all 5 KPI sheets into it side by side.",
+      "Add a <strong>Title text object</strong> above: <code>FIFA 18 Dataset — Key Metrics</code>. Rename dashboard <code>Grain 12 - KPI Summary</code>."
+    ],
+    insight_text:"A BAN (Big Ass Number) dashboard is the fastest way to communicate summary findings to a non-technical audience. These five numbers tell the whole dataset story in under 5 seconds.",
+    tip:"Add sparkline mini-charts below each BAN by creating a small line chart sheet and placing it beneath each KPI container. Use tiled layout in the dashboard for pixel-perfect alignment."
+  }
+];
+
+function buildShelf(shelves){
+  return shelves.map(s=>`
+    <div class="shelf-row">
+      <span class="shelf-label">${s.label}</span>
+      <span class="shelf-arrow">&#8594;</span>
+      ${s.fields.map(f=>`<span class="field-pill ${f.type}">${f.name}</span>`).join(' ')}
+    </div>`).join('');
+}
+
+function buildSteps(steps){
+  return steps.map((s,i)=>`
+    <div class="step">
+      <div class="step-num">${i+1}</div>
+      <div class="step-text">${s}</div>
+    </div>`).join('');
+}
+
+const container = document.getElementById('grains');
+
+GRAINS.forEach(g=>{
+  const card = document.createElement('div');
+  card.className = 'grain-card';
+  card.innerHTML = `
+    <div class="color-strip" style="background:${g.color}"></div>
+    <div class="grain-header" id="hdr-${g.num}" onclick="toggle('${g.num}')">
+      <div class="grain-num-badge" style="background:${g.lightColor};color:${g.color}">
+        ${g.num}
+      </div>
+      <div class="grain-meta">
+        <div class="chart-type" style="color:${g.color}">${g.chartType}</div>
+        <h3>${g.title}</h3>
+        <p>${g.summary}</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:.25rem">
+        <div class="grain-insight">
+          <div class="val" style="color:${g.color}">${g.insight}</div>
+          <div class="lbl">${g.insightLabel}</div>
+        </div>
+        <span class="expand-icon">&#9660;</span>
+      </div>
+    </div>
+    <div class="grain-body" id="body-${g.num}">
+      <div class="grain-body-grid">
+        <div>
+          <div class="section-label">Shelf configuration</div>
+          <div class="shelf-diagram">${buildShelf(g.shelves)}</div>
+          <div class="insight-box" style="margin-top:.75rem">
+            <strong>What you will see:</strong> ${g.insight_text}
+          </div>
+        </div>
+        <div>
+          <div class="section-label">Step-by-step in Tableau</div>
+          <div class="steps-list">${buildSteps(g.steps)}</div>
+          <div class="tip-box"><strong>Pro tip:</strong> ${g.tip}</div>
+        </div>
+      </div>
+    </div>`;
+  container.appendChild(card);
+});
+
+function toggle(num){
+  const hdr = document.getElementById('hdr-'+num);
+  const body = document.getElementById('body-'+num);
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.grain-body').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.grain-header').forEach(h=>h.classList.remove('open'));
+  if(!isOpen){ body.classList.add('open'); hdr.classList.add('open'); }
+}
+</script>
+</body>
+</html>
